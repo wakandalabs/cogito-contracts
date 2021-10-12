@@ -5,7 +5,7 @@ import ExampleNFT from 0xNFTCONTRACTADDRESS
 
 pub fun main(account: Address): Int {
     let collectionRef = getAccount(account)
-        .getCapability(/public/%s)
+        .getCapability(/public/NFTCollection)
         .borrow<&{NonFungibleToken.CollectionPublic}>()
         ?? panic("Could not borrow capability from public collection")
 
