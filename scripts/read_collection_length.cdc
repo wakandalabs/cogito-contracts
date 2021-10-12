@@ -1,5 +1,5 @@
 import NonFungibleToken from 0xNFTADDRESS
-import ExampleNFT from 0x0xNFTCONTRACTADDRESS
+import ExampleNFT from 0xNFTCONTRACTADDRESS
 
 // This transaction gets the length of an account's nft collection
 

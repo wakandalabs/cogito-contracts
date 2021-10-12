@@ -1,9 +1,6 @@
-# Flow Non-Fungible Token Standard
+# Cogito
 
-This is a description of the work-in-progress standard for 
-non-fungible token contracts on the Flow Blockchain.  It is meant to contain 
-the minimum functionality to implement a safe, secure, easy to understand, 
-and easy to use non-fungible token contract in Cadence.
+[Flow Playground](https://play.onflow.org/ca9beb1b-5999-4b7d-81fc-63f9fba74b96)
 
 ## What is Flow?
 
@@ -152,7 +149,7 @@ You can find automated tests in the `lib/go/test/nft_test.go` file. It uses the 
 - Owner is able to increase and decrease the approval at will, or revoke it completely
     - This is much harder than anticipated
 
-11 - Standard for Composability/Extensibility 
+11 - Standard for Composability/Extensibility
 
 12 - Minting a specific amount of tokens using a specific minter resource that an owner can control
 
@@ -170,11 +167,4 @@ You can find automated tests in the `lib/go/test/nft_test.go` file. It uses the 
 
 15 - Cloning the token to create a new token with the same distribution
 
-## License 
-
-The works in these folders 
-/onflow/flow-NFT/blob/master/contracts/ExampleNFT.cdc 
-/onflow/flow-NFT/blob/master/contracts/NonFungibleToken.cdc
-
-are under the Unlicense
-https://github.com/onflow/flow-NFT/blob/master/LICENSE
+## License
