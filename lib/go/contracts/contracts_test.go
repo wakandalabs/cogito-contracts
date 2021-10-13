@@ -8,7 +8,7 @@ import (
 	"github.com/onflow/flow-nft/lib/go/contracts"
 )
 
-const addrA = "0x0A"
+const addrA = "0A"
 
 func TestNonFungibleTokenContract(t *testing.T) {
 	contract := contracts.NonFungibleToken()

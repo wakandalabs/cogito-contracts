@@ -13,7 +13,7 @@ import (
 const (
 	nonfungibleTokenFilename       = "NonFungibleToken.cdc"
 	cogitoFilename                 = "Cogito.cdc"
-	defaultNonFungibleTokenAddress = "0xNonFungibleTokenAddr"
+	defaultNonFungibleTokenAddress = "NonFungibleTokenAddr"
 )
 
 // NonFungibleToken returns the NonFungibleToken contract interface.
