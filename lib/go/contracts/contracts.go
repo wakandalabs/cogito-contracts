@@ -12,8 +12,8 @@ import (
 
 const (
 	nonfungibleTokenFilename       = "NonFungibleToken.cdc"
-	exampleNFTFilename             = "ExampleNFT.cdc"
-	defaultNonFungibleTokenAddress = "02"
+	cogitoFilename                 = "Cogito.cdc"
+	defaultNonFungibleTokenAddress = "0xNonFungibleTokenAddr"
 )
 
 // NonFungibleToken returns the NonFungibleToken contract interface.
@@ -25,12 +25,12 @@ func NonFungibleToken() []byte {
 //
 // The returned contract will import the NonFungibleToken contract from the specified address.
 func ExampleNFT(nonfungibleTokenAddr string) []byte {
-	code := assets.MustAssetString(exampleNFTFilename)
+	code := assets.MustAssetString(cogitoFilename)
 
 	code = strings.ReplaceAll(
 		code,
-		"0x"+defaultNonFungibleTokenAddress,
-		"0x"+nonfungibleTokenAddr,
+		defaultNonFungibleTokenAddress,
+		nonfungibleTokenAddr,
 	)
 
 	return []byte(code)

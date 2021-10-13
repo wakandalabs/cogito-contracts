@@ -2,9 +2,9 @@
 // It is not part of the official standard but it assumed to be
 // very similar to how many NFTs would implement the core functionality.
 
-import NonFungibleToken from 0x02
+import NonFungibleToken from 0xNonFungibleTokenAddr
 
-pub contract ExampleNFT: NonFungibleToken {
+pub contract Cogito: NonFungibleToken {
 
     pub var totalSupply: UInt64
 
@@ -102,17 +102,17 @@ pub contract ExampleNFT: NonFungibleToken {
 
         // Create a Collection resource and save it to storage
         let collection <- create Collection()
-        self.account.save(<-collection, to: /storage/NFTCollection)
+        self.account.save(<-collection, to: /storage/CogitoCollection)
 
         // create a public capability for the collection
         self.account.link<&{NonFungibleToken.CollectionPublic}>(
-            /public/NFTCollection,
-            target: /storage/NFTCollection
+            /public/CogitoCollection,
+            target: /storage/CogitoCollection
         )
 
         // Create a Minter resource and save it to storage
         let minter <- create NFTMinter()
-        self.account.save(<-minter, to: /storage/NFTMinter)
+        self.account.save(<-minter, to: /storage/CogitoMinter)
 
         emit ContractInitialized()
     }
