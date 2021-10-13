@@ -1,7 +1,7 @@
 package templates
 
 import (
-	"github.com/wakandalabs/cogito-contracts/lib/go/templates/internal/assets"
+	"github.com/onflow/flow-nft/lib/go/templates/internal/assets"
 )
 
 const (
