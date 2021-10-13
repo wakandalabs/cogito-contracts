@@ -2,7 +2,7 @@
 // It is not part of the official standard but it assumed to be
 // very similar to how many NFTs would implement the core functionality.
 
-import NonFungibleToken from 0xNonFungibleTokenAddr
+import NonFungibleToken from 0xNFTADDRESS
 
 pub contract Cogito: NonFungibleToken {
 
@@ -44,7 +44,7 @@ pub contract Cogito: NonFungibleToken {
         // deposit takes a NFT and adds it to the collections dictionary
         // and adds the ID to the id array
         pub fun deposit(token: @NonFungibleToken.NFT) {
-            let token <- token as! @ExampleNFT.NFT
+            let token <- token as! @Cogito.NFT
 
             let id: UInt64 = token.id
 
@@ -87,12 +87,12 @@ pub contract Cogito: NonFungibleToken {
         pub fun mintNFT(recipient: &{NonFungibleToken.CollectionPublic}) {
 
             // create a new NFT
-            var newNFT <- create NFT(initID: ExampleNFT.totalSupply)
+            var newNFT <- create NFT(initID: Cogito.totalSupply)
 
             // deposit it in the recipient's account using their reference
             recipient.deposit(token: <-newNFT)
 
-            ExampleNFT.totalSupply = ExampleNFT.totalSupply + UInt64(1)
+            Cogito.totalSupply = Cogito.totalSupply + UInt64(1)
         }
     }
 

@@ -11,26 +11,26 @@ import (
 )
 
 const (
-	nonfungibleTokenFilename       = "NonFungibleToken.cdc"
-	cogitoFilename                 = "Cogito.cdc"
-	defaultNonFungibleTokenAddress = "NonFungibleTokenAddr"
+	nftFilename       = "NonFungibleToken.cdc"
+	cogitoFilename    = "Cogito.cdc"
+	defaultNFTAddress = "NonFungibleTokenAddr"
 )
 
-// NonFungibleToken returns the NonFungibleToken contract interface.
-func NonFungibleToken() []byte {
-	return assets.MustAsset(nonfungibleTokenFilename)
+// GenerateNFTContract returns the NonFungibleToken contract interface.
+func GenerateNFTContract() []byte {
+	return assets.MustAsset(nftFilename)
 }
 
-// ExampleNFT returns the ExampleNFT contract.
+// GenerateCogitoContract returns the Cogito contract.
 //
 // The returned contract will import the NonFungibleToken contract from the specified address.
-func ExampleNFT(nonfungibleTokenAddr string) []byte {
+func GenerateCogitoContract(nftAddress string) []byte {
 	code := assets.MustAssetString(cogitoFilename)
 
 	code = strings.ReplaceAll(
 		code,
-		defaultNonFungibleTokenAddress,
-		nonfungibleTokenAddr,
+		defaultNFTAddress,
+		nftAddress,
 	)
 
 	return []byte(code)

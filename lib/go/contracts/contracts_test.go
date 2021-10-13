@@ -11,12 +11,12 @@ import (
 const addrA = "0A"
 
 func TestNonFungibleTokenContract(t *testing.T) {
-	contract := contracts.NonFungibleToken()
+	contract := contracts.GenerateNFTContract()
 	assert.NotNil(t, contract)
 }
 
-func TestExampleNFTContract(t *testing.T) {
-	contract := contracts.ExampleNFT(addrA)
+func TestCogitoContract(t *testing.T) {
+	contract := contracts.GenerateCogitoContract(addrA)
 	assert.NotNil(t, contract)
 	assert.Contains(t, string(contract), addrA)
 }

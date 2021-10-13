@@ -1,5 +1,5 @@
 import NonFungibleToken from 0xNFTADDRESS
-import ExampleNFT from 0xNFTCONTRACTADDRESS
+import Cogito from 0xCOGITOADDRESS
 
 // This transaction is for transferring and NFT from
 // one account to another
@@ -12,11 +12,11 @@ transaction(recipient: Address, withdrawID: UInt64) {
         let recipient = getAccount(recipient)
 
         // borrow a reference to the signer's NFT collection
-        let collectionRef = acct.borrow<&ExampleNFT.Collection>(from: /storage/NFTCollection)
+        let collectionRef = acct.borrow<&Cogito.Collection>(from: /storage/CogitoCollection)
             ?? panic("Could not borrow a reference to the owner's collection")
 
         // borrow a public reference to the receivers collection
-        let depositRef = recipient.getCapability(/public/NFTCollection)
+        let depositRef = recipient.getCapability(/public/CogitoCollection)
             .borrow<&{NonFungibleToken.CollectionPublic}>()
             ?? panic("Could not borrow a reference to the receiver's collection")
 
