@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/onflow/flow-nft/lib/go/contracts"
+	"github.com/wakandalabs/cogito-contracts/lib/go/contracts"
 )
 
 const addrA = "0A"

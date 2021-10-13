@@ -1,8 +1,6 @@
 package templates
 
-import (
-	"github.com/onflow/flow-nft/lib/go/templates/internal/assets"
-)
+import "github.com/wakandalabs/cogito-contracts/lib/go/templates/internal/assets"
 
 const (
 	transactionsPath     = "../../../transactions/"
@@ -27,7 +25,7 @@ func GenerateSetupAccountScript(env Environment) []byte {
 
 // GenerateTransferNFTScript generates a script to transfer nft
 func GenerateTransferNFTScript(env Environment) []byte {
-	code := assets.MustAssetString(transactionsPath + transactionsPath)
+	code := assets.MustAssetString(transactionsPath + transferNFTFilename)
 
 	return []byte(replaceAddresses(code, env))
 }

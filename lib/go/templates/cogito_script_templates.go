@@ -1,8 +1,6 @@
 package templates
 
-import (
-	"github.com/onflow/flow-nft/lib/go/templates/internal/assets"
-)
+import "github.com/wakandalabs/cogito-contracts/lib/go/templates/internal/assets"
 
 const (
 	scriptsPath                  = "../../../scripts/"

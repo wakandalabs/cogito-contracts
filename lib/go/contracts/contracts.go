@@ -3,17 +3,16 @@ package contracts
 //go:generate go run github.com/kevinburke/go-bindata/go-bindata -prefix ../../../contracts -o internal/assets/assets.go -pkg assets -nometadata -nomemcopy ../../../contracts
 
 import (
+	"github.com/wakandalabs/cogito-contracts/lib/go/contracts/internal/assets"
 	"strings"
 
 	_ "github.com/kevinburke/go-bindata"
-
-	"github.com/onflow/flow-nft/lib/go/contracts/internal/assets"
 )
 
 const (
 	nftFilename       = "NonFungibleToken.cdc"
 	cogitoFilename    = "Cogito.cdc"
-	defaultNFTAddress = "NonFungibleTokenAddr"
+	defaultNFTAddress = "0xNFTADDRESS"
 )
 
 // GenerateNFTContract returns the NonFungibleToken contract interface.
