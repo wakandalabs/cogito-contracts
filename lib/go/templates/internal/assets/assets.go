@@ -276,9 +276,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"..": {nil, map[string]*bintree{
 			"..": {nil, map[string]*bintree{
 				"transactions": {nil, map[string]*bintree{
-					"mint_nft.cdc":      {TransactionsMint_nftCdc, map[string]*bintree{}},
+					"mint_nft.cdc": {TransactionsMint_nftCdc, map[string]*bintree{}},
 					"setup_account.cdc": {TransactionsSetup_accountCdc, map[string]*bintree{}},
-					"transfer_nft.cdc":  {TransactionsTransfer_nftCdc, map[string]*bintree{}},
+					"transfer_nft.cdc": {TransactionsTransfer_nftCdc, map[string]*bintree{}},
 				}},
 			}},
 		}},
