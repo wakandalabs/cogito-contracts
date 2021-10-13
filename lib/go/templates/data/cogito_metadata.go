@@ -40,7 +40,7 @@ func GenerateEmptyCogitoMetadata(name string) CogitoMetadata {
 	properties = append(properties, property1)
 
 	return CogitoMetadata{
-		Name:        "Name of Cogito",
+		Name:        name,
 		Description: "Description of Cogito",
 		Image: IpfsFile{
 			FileName: "Image Cover",
