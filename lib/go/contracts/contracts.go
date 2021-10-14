@@ -12,7 +12,7 @@ import (
 const (
 	nftFilename       = "NonFungibleToken.cdc"
 	cogitoFilename    = "Cogito.cdc"
-	defaultNFTAddress = "0xNFTADDRESS"
+	defaultNFTAddress = "NFTADDRESS"
 )
 
 // GenerateNFTContract returns the NonFungibleToken contract interface.
