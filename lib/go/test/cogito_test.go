@@ -21,8 +21,78 @@ const (
 	emulatorFlowTokenAddress = "0ae53cb6e3f42a79"
 )
 
-// This test is for testing the deployment the cogito smart contracts
+// TestCogitoDeployment tests the deployment the cogito smart contracts
 func TestCogitoDeployment(t *testing.T) {
+	b := newBlockchain()
+
+	// Should be able to deploy the NFT contract
+	// as a new account with no keys.
+	nftCode := contracts.GenerateNFTContract()
+	nftAddr, err := b.CreateAccount(nil, []sdktemplates.Contract{
+		{
+			Name:   "NonFungibleToken",
+			Source: string(nftCode),
+		},
+	})
+	if !assert.NoError(t, err) {
+		t.Log(err.Error())
+	}
+	_, err = b.CommitBlock()
+	assert.NoError(t, err)
+
+	// Should be able to deploy the cogito contract
+	// as a new account with no keys.
+	cogitoCode := contracts.GenerateCogitoContract(nftAddr.String())
+	_, err = b.CreateAccount(nil, []sdktemplates.Contract{
+		{
+			Name:   "Cogito",
+			Source: string(cogitoCode),
+		},
+	})
+	if !assert.NoError(t, err) {
+		t.Log(err.Error())
+	}
+	_, err = b.CommitBlock()
+	assert.NoError(t, err)
+}
+
+// TestMintCogito tests the pure functionality of the smart contract
+func TestMintCogito(t *testing.T) {
+	b := newBlockchain()
+
+	// Should be able to deploy the NFT contract
+	// as a new account with no keys.
+	nftCode := contracts.GenerateNFTContract()
+	nftAddr, err := b.CreateAccount(nil, []sdktemplates.Contract{
+		{
+			Name:   "NonFungibleToken",
+			Source: string(nftCode),
+		},
+	})
+	if !assert.NoError(t, err) {
+		t.Log(err.Error())
+	}
+	_, err = b.CommitBlock()
+	assert.NoError(t, err)
+
+	// Should be able to deploy the cogito contract
+	// as a new account with no keys.
+	cogitoCode := contracts.GenerateCogitoContract(nftAddr.String())
+	_, err = b.CreateAccount(nil, []sdktemplates.Contract{
+		{
+			Name:   "Cogito",
+			Source: string(cogitoCode),
+		},
+	})
+	if !assert.NoError(t, err) {
+		t.Log(err.Error())
+	}
+	_, err = b.CommitBlock()
+	assert.NoError(t, err)
+}
+
+// TestTransferCogito
+func TestTransferCogito(t *testing.T) {
 	b := newBlockchain()
 
 	// Should be able to deploy the NFT contract
