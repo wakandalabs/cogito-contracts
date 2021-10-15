@@ -11,11 +11,11 @@ pub contract Cogito: NonFungibleToken {
     pub resource NFT: NonFungibleToken.INFT {
         pub let id: UInt64
 
-        pub var metadata: {String: String}
+        pub var metadata: String
 
         init(initID: UInt64) {
             self.id = initID
-            self.metadata = {}
+            self.metadata = ""
         }
     }
 
