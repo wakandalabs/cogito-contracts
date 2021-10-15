@@ -11,6 +11,7 @@ import (
 
 const (
 	placeholderFungibleTokenAddress = "0xFUNGIBLETOKENADDRESS"
+	placeholderFlowTokenAddress     = "0xFLOWTOKENADDRESS"
 	placeholderNFTAddress           = "0xNFTADDRESS"
 	placeholderCogitoAddress        = "0xCOGITOADDRESS"
 )
@@ -20,6 +21,7 @@ type Environment struct {
 	FungibleTokenAddress string
 	NFTAddress           string
 	CogitoAddress        string
+	FlowTokenAddress     string
 }
 
 func uint32ToCadenceArr(nums []uint32) []byte {

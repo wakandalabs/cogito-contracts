@@ -1,6 +1,10 @@
 package test
 
 import (
+	"github.com/onflow/cadence"
+	"github.com/onflow/flow-go-sdk"
+	"github.com/onflow/flow-go-sdk/test"
+	"github.com/wakandalabs/cogito-contracts/lib/go/templates"
 	"testing"
 
 	//"github.com/onflow/cadence"
@@ -60,35 +64,42 @@ func TestCogitoDeployment(t *testing.T) {
 func TestMintCogito(t *testing.T) {
 	b := newBlockchain()
 
+	accountKeys := test.AccountKeyGenerator()
+
+	env := templates.Environment{
+		FungibleTokenAddress: emulatorFTAddress,
+		FlowTokenAddress:     emulatorFlowTokenAddress,
+	}
+
 	// Should be able to deploy the NFT contract
 	// as a new account with no keys.
 	nftCode := contracts.GenerateNFTContract()
-	nftAddr, err := b.CreateAccount(nil, []sdktemplates.Contract{
+	nftAddr, _ := b.CreateAccount(nil, []sdktemplates.Contract{
 		{
 			Name:   "NonFungibleToken",
 			Source: string(nftCode),
 		},
 	})
-	if !assert.NoError(t, err) {
-		t.Log(err.Error())
-	}
-	_, err = b.CommitBlock()
-	assert.NoError(t, err)
+
+	env.NFTAddress = nftAddr.String()
 
 	// Should be able to deploy the cogito contract
 	// as a new account with no keys.
 	cogitoCode := contracts.GenerateCogitoContract(nftAddr.String())
-	_, err = b.CreateAccount(nil, []sdktemplates.Contract{
+	cogitoAccountKey, _ := accountKeys.NewWithSigner()
+	cogitoAddr, _ := b.CreateAccount([]*flow.AccountKey{cogitoAccountKey}, []sdktemplates.Contract{
 		{
 			Name:   "Cogito",
 			Source: string(cogitoCode),
 		},
 	})
-	if !assert.NoError(t, err) {
-		t.Log(err.Error())
-	}
-	_, err = b.CommitBlock()
-	assert.NoError(t, err)
+
+	env.CogitoAddress = cogitoAddr.String()
+
+	// Check that that main contract fields were initialized correctly
+	result := executeScriptAndCheck(t, b, templates.GenerateGetTotalSupplyScript(env), nil)
+	assert.Equal(t, cadence.NewUInt64(0), result)
+
 }
 
 // TestTransferCogito
