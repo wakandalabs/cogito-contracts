@@ -3,15 +3,15 @@ package templates
 import "github.com/wakandalabs/cogito-contracts/lib/go/templates/internal/assets"
 
 const (
-	transactionsPath     = "../../../transactions/"
-	mintNFTFilename      = "mint_nft.cdc"
-	setupAccountFilename = "setup_account.cdc"
-	transferNFTFilename  = "transfer_nft.cdc"
+	transactionsPath       = "../../../transactions/"
+	mintCogitoFilename     = "mint_cogito.cdc"
+	setupAccountFilename   = "setup_account.cdc"
+	transferCogitoFilename = "transfer_cogito.cdc"
 )
 
 // GenerateMintNFTScript generates a script to mint a new nft
 func GenerateMintNFTScript(env Environment) []byte {
-	code := assets.MustAssetString(transactionsPath + mintNFTFilename)
+	code := assets.MustAssetString(transactionsPath + mintCogitoFilename)
 
 	return []byte(replaceAddresses(code, env))
 }
@@ -25,7 +25,7 @@ func GenerateSetupAccountScript(env Environment) []byte {
 
 // GenerateTransferNFTScript generates a script to transfer nft
 func GenerateTransferNFTScript(env Environment) []byte {
-	code := assets.MustAssetString(transactionsPath + transferNFTFilename)
+	code := assets.MustAssetString(transactionsPath + transferCogitoFilename)
 
 	return []byte(replaceAddresses(code, env))
 }

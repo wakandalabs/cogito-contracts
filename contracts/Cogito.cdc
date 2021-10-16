@@ -1,21 +1,49 @@
+/*
+    Description: Central Smart Contract for Cogito Ergo Sum
+*/
+
 import NonFungibleToken from 0xNFTADDRESS
 
 pub contract Cogito: NonFungibleToken {
 
-    pub var totalSupply: UInt64
+    // -----------------------------------------------------------------------
+    // Cogito contract Events
+    // -----------------------------------------------------------------------
 
+    // Emitted when the Cogito contract is created
     pub event ContractInitialized()
+    // Emitted when a cogito is withdrawn from a Collection
     pub event Withdraw(id: UInt64, from: Address?)
+    // Emitted when a cogito is deposited into a Collection
     pub event Deposit(id: UInt64, to: Address?)
+
+    pub event CogitoMinted(id: UInt64, metadata: String)
+
+    // Emitted when a Cogito is destroyed
+    pub event CogitoDestroyed(id: UInt64)
+
+    // The total number of Cogito NFTs that have been created
+    // Because NFTs can be destroyed, it doesn't necessarily mean that this
+    // reflects the total number of NFTs in existence, just the number that
+    // have been minted to date. Also used as global cogito IDs for minting.
+    pub var totalSupply: UInt64
 
     pub resource NFT: NonFungibleToken.INFT {
         pub let id: UInt64
 
         pub var metadata: String
 
-        init(initID: UInt64) {
+        init(initID: UInt64, metadata: String) {
             self.id = initID
-            self.metadata = ""
+            self.metadata = metadata
+
+            emit CogitoMinted(id: self.id, metadata: self.metadata)
+        }
+
+        // If the Cogito is destroyed, emit an event to indicate
+        // to outside observers that it has been destroyed
+        destroy() {
+            emit CogitoDestroyed(id: self.id)
         }
     }
 
@@ -73,22 +101,26 @@ pub contract Cogito: NonFungibleToken {
         return <- create Collection()
     }
 
+    pub fun createNewMinter(): @Cogito.CogitoMinter {
+        return <- create CogitoMinter()
+    }
+
     // Resource that an admin or something similar would own to be
     // able to mint new NFTs
     //
-    pub resource NFTMinter {
+    pub resource CogitoMinter {
 
         // mintNFT mints a new NFT with a new ID
         // and deposit it in the recipients collection using their collection reference
-        pub fun mintNFT(recipient: &{NonFungibleToken.CollectionPublic}) {
+        pub fun mintNFT(recipient: &{NonFungibleToken.CollectionPublic}, metadata: String) {
 
             // create a new NFT
-            var newNFT <- create NFT(initID: Cogito.totalSupply)
+            var newNFT <- create NFT(initID: Cogito.totalSupply, metadata: metadata)
 
             // deposit it in the recipient's account using their reference
             recipient.deposit(token: <-newNFT)
 
-            Cogito.totalSupply = Cogito.totalSupply + UInt64(1)
+            Cogito.totalSupply = Cogito.totalSupply + (1 as UInt64)
         }
     }
 
@@ -107,10 +139,9 @@ pub contract Cogito: NonFungibleToken {
         )
 
         // Create a Minter resource and save it to storage
-        let minter <- create NFTMinter()
+        let minter <- create CogitoMinter()
         self.account.save(<-minter, to: /storage/CogitoMinter)
 
         emit ContractInitialized()
     }
 }
-

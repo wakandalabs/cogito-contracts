@@ -5,7 +5,7 @@ import Cogito from 0xCOGITOADDRESS
 // It must be run with the account that has the minter resource
 // stored in /storage/CogitoMinter
 
-transaction(recipient: Address) {
+transaction(recipient: Address, metadata: String) {
 
     // local variable for storing the minter reference
     let minter: &Cogito.CogitoMinter
@@ -25,6 +25,6 @@ transaction(recipient: Address) {
             ?? panic("Could not get receiver reference to the NFT Collection")
 
         // Mint the NFT and deposit it to the recipient's collection
-        self.minter.mintNFT(recipient: receiver)
+        self.minter.mintNFT(recipient: receiver, metadata: metadata)
     }
 }
