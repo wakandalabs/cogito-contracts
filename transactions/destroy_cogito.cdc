@@ -5,7 +5,7 @@ import Cogito from 0xCOGITOADDRESS
 // It must be run with the account that has the collection resource
 // stored in /storage/CogitoCollection
 
-transaction(destroyID: UInt64) {
+transaction(id: UInt64) {
 
     // local variable for storing the minter reference
     let collection: &Cogito.Collection
@@ -19,6 +19,6 @@ transaction(destroyID: UInt64) {
 
     execute {
         // Destroy the NFT
-        self.collection.destroyNFT(destroyID: destroyID)
+        self.collection.destroyNFT(id: id)
     }
 }
