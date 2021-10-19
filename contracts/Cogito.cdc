@@ -27,11 +27,11 @@ pub contract Cogito: NonFungibleToken {
     // have been minted to date. Also used as global cogito IDs for minting.
     pub var totalSupply: UInt64
 
-    pub resource interface CogitoPublic {
+    pub resource interface ICOGITO {
         pub fun getTokenURI(): String
     }
 
-    pub resource NFT: NonFungibleToken.INFT, CogitoPublic {
+    pub resource NFT: NonFungibleToken.INFT, ICOGITO {
         pub let id: UInt64
 
         pub var metadata: String
@@ -49,20 +49,18 @@ pub contract Cogito: NonFungibleToken {
             emit Destroyed(id: self.id)
         }
 
-        pub fun getTokenURI():String {
+        pub fun getTokenURI(): String {
             return self.metadata
         }
     }
 
-    pub resource interface CollectionMinter {
+    pub resource interface CollectionPublic {
         pub fun mintNFT(metadata: String)
-    }
-
-    pub resource interface CollectionDestroy {
         pub fun destroyNFT(id: UInt64)
+        pub fun borrowCogitoPublic(id: UInt64): &Cogito.NFT{NonFungibleToken.INFT, ICOGITO}
     }
 
-    pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, CollectionMinter, CollectionDestroy {
+    pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, CollectionPublic {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
         pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -106,6 +104,12 @@ pub contract Cogito: NonFungibleToken {
             return &self.ownedNFTs[id] as &NonFungibleToken.NFT
         }
 
+        pub fun borrowCogitoPublic(id: UInt64): &Cogito.NFT{NonFungibleToken.INFT, ICOGITO} {
+            let cogitoRef = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT
+            let intermediateRef = cogitoRef as! auth &Cogito.NFT
+            return intermediateRef as &Cogito.NFT{NonFungibleToken.INFT, ICOGITO}
+        }
+
         destroy() {
             destroy self.ownedNFTs
         }
@@ -132,6 +136,16 @@ pub contract Cogito: NonFungibleToken {
     // public function that anyone can call to create a new empty collection
     pub fun createEmptyCollection(): @NonFungibleToken.Collection {
         return <- create Collection()
+    }
+
+    pub fun tokenURI(address: Address, id: UInt64): String {
+        if let collectionRef = getAccount(address).getCapability(/public/CogitoCollection).borrow<&{NonFungibleToken.CollectionPublic, CollectionPublic}>() {
+            let pass = collectionRef.borrowCogitoPublic(id: id)
+            if pass != nil {
+                return pass.getTokenURI()
+            }
+        }
+        return ""
     }
 
     init() {
