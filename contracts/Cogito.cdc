@@ -28,7 +28,7 @@ pub contract Cogito: NonFungibleToken {
     pub var totalSupply: UInt64
 
     pub resource interface ICOGITO {
-        pub fun getTokenURI(): String
+        pub fun getMetadata(): String
     }
 
     pub resource NFT: NonFungibleToken.INFT, ICOGITO {
@@ -49,7 +49,7 @@ pub contract Cogito: NonFungibleToken {
             emit Destroyed(id: self.id)
         }
 
-        pub fun getTokenURI(): String {
+        pub fun getMetadata(): String {
             return self.metadata
         }
     }
@@ -142,7 +142,7 @@ pub contract Cogito: NonFungibleToken {
         if let collectionRef = getAccount(address).getCapability(/public/CogitoCollection).borrow<&{NonFungibleToken.CollectionPublic, CollectionPublic}>() {
             let pass = collectionRef.borrowCogitoPublic(id: id)
             if pass != nil {
-                return pass.getTokenURI()
+                return pass.getMetadata()
             }
         }
         return ""
