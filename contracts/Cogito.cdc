@@ -27,7 +27,11 @@ pub contract Cogito: NonFungibleToken {
     // have been minted to date. Also used as global cogito IDs for minting.
     pub var totalSupply: UInt64
 
-    pub resource NFT: NonFungibleToken.INFT {
+    pub resource interface CogitoPublic {
+        pub fun getTokenURI(): String
+    }
+
+    pub resource NFT: NonFungibleToken.INFT, CogitoPublic {
         pub let id: UInt64
 
         pub var metadata: String
@@ -44,9 +48,21 @@ pub contract Cogito: NonFungibleToken {
         destroy() {
             emit Destroyed(id: self.id)
         }
+
+        pub fun getTokenURI():String {
+            return self.metadata
+        }
     }
 
-    pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic {
+    pub resource interface CollectionMinter {
+        pub fun mintNFT(metadata: String)
+    }
+
+    pub resource interface CollectionDestroy {
+        pub fun destroyNFT(id: UInt64)
+    }
+
+    pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, CollectionMinter, CollectionDestroy {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
         pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -106,11 +122,8 @@ pub contract Cogito: NonFungibleToken {
             Cogito.totalSupply = Cogito.totalSupply + (1 as UInt64)
         }
 
-        // Destroyed NFT
-        pub fun destroyNFT(destroyID: UInt64) {
-            let token <- self.withdraw(withdrawID: destroyID)
-
-            emit Destroyed(id: destroyID)
+          pub fun destroyNFT(id: UInt64) {
+            let token <- self.withdraw(withdrawID: id)
 
             destroy token
         }
