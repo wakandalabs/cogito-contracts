@@ -16,11 +16,10 @@ pub contract Cogito: NonFungibleToken {
     pub event Withdraw(id: UInt64, from: Address?)
     // Emitted when a cogito is deposited into a Collection
     pub event Deposit(id: UInt64, to: Address?)
-
-    pub event CogitoMinted(id: UInt64, metadata: String)
-
+    // Emitted when a cogito is minted into a Collection
+    pub event Minted(id: UInt64, metadata: String)
     // Emitted when a Cogito is destroyed
-    pub event CogitoDestroyed(id: UInt64)
+    pub event Destroyed(id: UInt64)
 
     // The total number of Cogito NFTs that have been created
     // Because NFTs can be destroyed, it doesn't necessarily mean that this
@@ -37,13 +36,13 @@ pub contract Cogito: NonFungibleToken {
             self.id = initID
             self.metadata = metadata
 
-            emit CogitoMinted(id: self.id, metadata: self.metadata)
+            emit Minted(id: self.id, metadata: self.metadata)
         }
 
         // If the Cogito is destroyed, emit an event to indicate
         // to outside observers that it has been destroyed
         destroy() {
-            emit CogitoDestroyed(id: self.id)
+            emit Destroyed(id: self.id)
         }
     }
 
@@ -94,34 +93,32 @@ pub contract Cogito: NonFungibleToken {
         destroy() {
             destroy self.ownedNFTs
         }
-    }
 
-    // public function that anyone can call to create a new empty collection
-    pub fun createEmptyCollection(): @NonFungibleToken.Collection {
-        return <- create Collection()
-    }
-
-    pub fun createNewMinter(): @Cogito.CogitoMinter {
-        return <- create CogitoMinter()
-    }
-
-    // Resource that an admin or something similar would own to be
-    // able to mint new NFTs
-    //
-    pub resource CogitoMinter {
-
-        // mintNFT mints a new NFT with a new ID
-        // and deposit it in the recipients collection using their collection reference
-        pub fun mintNFT(recipient: &{NonFungibleToken.CollectionPublic}, metadata: String) {
+            // mintNFT can mint cogito for self
+        pub fun mintNFT(metadata: String) {
 
             // create a new NFT
             var newNFT <- create NFT(initID: Cogito.totalSupply, metadata: metadata)
 
             // deposit it in the recipient's account using their reference
-            recipient.deposit(token: <-newNFT)
+            self.deposit(token: <-newNFT)
 
             Cogito.totalSupply = Cogito.totalSupply + (1 as UInt64)
         }
+
+        // Destroyed NFT
+        pub fun destroyNFT(destroyID: UInt64) {
+            let token <- self.withdraw(withdrawID: destroyID)
+
+            emit Destroyed(id: destroyID)
+
+            destroy token
+        }
+    }
+
+    // public function that anyone can call to create a new empty collection
+    pub fun createEmptyCollection(): @NonFungibleToken.Collection {
+        return <- create Collection()
     }
 
     init() {
@@ -137,10 +134,6 @@ pub contract Cogito: NonFungibleToken {
             /public/CogitoCollection,
             target: /storage/CogitoCollection
         )
-
-        // Create a Minter resource and save it to storage
-        let minter <- create CogitoMinter()
-        self.account.save(<-minter, to: /storage/CogitoMinter)
 
         emit ContractInitialized()
     }

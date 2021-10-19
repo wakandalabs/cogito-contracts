@@ -23,10 +23,5 @@ transaction {
             /public/CogitoCollection,
             target: /storage/CogitoCollection
         )
-
-        // Create a new minter
-        let minter <- Cogito.createNewMinter()
-
-        acct.save(<-minter, to: /storage/CogitoMinter)
     }
 }
