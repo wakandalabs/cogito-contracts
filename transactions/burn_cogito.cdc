@@ -13,12 +13,12 @@ transaction(id: UInt64) {
     prepare(signer: AuthAccount) {
 
         // borrow a reference to the NFTMinter resource in storage
-        self.collection = signer.borrow<&Cogito.Collection>(from: /storage/CogitoCollection)
+        self.collection = signer.borrow<&Cogito.Collection>(from: Cogito.CollectionStoragePath)
             ?? panic("Could not borrow a reference to the NFT collection")
     }
 
     execute {
-        // Destroy the NFT
-        self.collection.destroyNFT(id: id)
+        // Burn the NFT
+        self.collection.burnNFT(id: id)
     }
 }
