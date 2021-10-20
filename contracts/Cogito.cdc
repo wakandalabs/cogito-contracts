@@ -44,9 +44,6 @@ pub contract Cogito: NonFungibleToken {
     // to allow others to deposit Cogito into their Collection. It also allows for reading
     // the details of Cogito in the Collection.
     pub resource interface CogitoCollectionPublic {
-        pub fun deposit(token: @NonFungibleToken.NFT)
-        pub fun getIDs(): [UInt64]
-        pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
         pub fun borrowCogito(id: UInt64): &Cogito.NFT? {
             // If the result isn't nil, the id of the returned reference
             // should be the same as the argument to the function
