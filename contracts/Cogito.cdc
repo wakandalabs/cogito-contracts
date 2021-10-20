@@ -1,4 +1,4 @@
-import NonFungibleToken from 0x01
+import NonFungibleToken from 0xNFTADDRESS
 
 //
 // NFT for Cogito ergo sum!
