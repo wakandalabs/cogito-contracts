@@ -6,7 +6,7 @@ import (
 
 const (
 	scriptsPath                  = "../../../transactions/scripts/"
-	totalSupplyFilename          = "get_totalSupply.cdc"
+	totalSupplyFilename          = "read_totalSupply.cdc"
 	readCollectionIdsFilename    = "read_collection_ids.cdc"
 	readCollectionLengthFilename = "read_collection_length.cdc"
 	readNFTByIdFilename          = "read_nft_by_id.cdc"

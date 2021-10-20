@@ -1,4 +1,4 @@
-import NonFungibleToken from 0xNFTADDRESS
+import NonFungibleToken from 0x01
 
 //
 // NFT for Cogito ergo sum!
@@ -11,6 +11,7 @@ pub contract Cogito: NonFungibleToken {
     pub event Withdraw(id: UInt64, from: Address?)
     pub event Deposit(id: UInt64, to: Address?)
     pub event Minted(id: UInt64, metadata: String)
+    pub event Burned(id: UInt64)
 
     // Named Paths
     //
@@ -55,6 +56,7 @@ pub contract Cogito: NonFungibleToken {
             }
         }
         pub fun mintNFT(metadata: String)
+        pub fun burnNFT(id: UInt64)
     }
 
     // Collection
@@ -129,6 +131,14 @@ pub contract Cogito: NonFungibleToken {
             self.deposit(token: <-create Cogito.NFT(id: Cogito.totalSupply, metadata: metadata))
 
             Cogito.totalSupply = Cogito.totalSupply + (1 as UInt64)
+        }
+
+        pub fun burnNFT(id: UInt64) {
+            emit Burned(id: id)
+
+            let token <- self.withdraw(withdrawID: id)
+
+            destroy token
         }
 
         // destructor
