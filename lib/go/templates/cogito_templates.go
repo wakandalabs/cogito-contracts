@@ -7,6 +7,7 @@ const (
 	mintCogitoFilename     = "mint_cogito.cdc"
 	setupAccountFilename   = "setup_account.cdc"
 	transferCogitoFilename = "transfer_cogito.cdc"
+	burnCogitoFilename     = "burn_cogito.cdc"
 )
 
 // GenerateMintNFTScript generates a script to mint a new nft
@@ -26,6 +27,13 @@ func GenerateSetupAccountScript(env Environment) []byte {
 // GenerateTransferNFTScript generates a script to transfer nft
 func GenerateTransferNFTScript(env Environment) []byte {
 	code := assets.MustAssetString(transactionsPath + transferCogitoFilename)
+
+	return []byte(replaceAddresses(code, env))
+}
+
+// GenerateBurnNFTScript generates a script to burn nft
+func GenerateBurnNFTScript(env Environment) []byte {
+	code := assets.MustAssetString(transactionsPath + burnCogitoFilename)
 
 	return []byte(replaceAddresses(code, env))
 }

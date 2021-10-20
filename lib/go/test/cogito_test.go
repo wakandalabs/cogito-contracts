@@ -53,6 +53,11 @@ func TestCogitoDeployment(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+// TestSetupCogito
+func TestSetupCogito(t *testing.T) {
+
+}
+
 // TestMintCogito tests the pure functionality of the smart contract
 func TestMintCogito(t *testing.T) {
 	b := newBlockchain()
@@ -103,5 +108,10 @@ func TestMintCogito(t *testing.T) {
 
 // TestTransferCogito
 func TestTransferCogito(t *testing.T) {
+
+}
+
+// TestBurnCogito
+func TestBurnCogito(t *testing.T) {
 
 }

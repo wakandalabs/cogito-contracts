@@ -6,15 +6,16 @@ import (
 
 const (
 	scriptsPath                  = "../../../transactions/scripts/"
-	totalSupplyFilename          = "read_totalSupply.cdc"
+	readTotalSupplyFilename      = "read_totalSupply.cdc"
 	readCollectionIdsFilename    = "read_collection_ids.cdc"
 	readCollectionLengthFilename = "read_collection_length.cdc"
-	readNFTByIdFilename          = "read_nft_by_id.cdc"
+	readTokenURIFilename         = "read_tokenURI.cdc"
+	isSetupCogitoFilename        = "is_setup_cogito.cdc"
 )
 
 // GenerateGetTotalSupplyScript generates a script to read collection ids
 func GenerateGetTotalSupplyScript(env Environment) []byte {
-	code := assets.MustAssetString(scriptsPath + totalSupplyFilename)
+	code := assets.MustAssetString(scriptsPath + readTotalSupplyFilename)
 
 	return []byte(replaceAddresses(code, env))
 }
@@ -33,9 +34,16 @@ func GenerateReadCollectionLengthScript(env Environment) []byte {
 	return []byte(replaceAddresses(code, env))
 }
 
-// GenerateReadNFTByIdScript generates a script to read nft by id
-func GenerateReadNFTByIdScript(env Environment) []byte {
-	code := assets.MustAssetString(scriptsPath + readNFTByIdFilename)
+// GenerateReadTokenURIScript generates a script to read nft tokenURI
+func GenerateReadTokenURIScript(env Environment) []byte {
+	code := assets.MustAssetString(scriptsPath + readTokenURIFilename)
+
+	return []byte(replaceAddresses(code, env))
+}
+
+// GenerateIsSetupCogitoScript generates a script is setup Cogito
+func GenerateIsSetupCogitoScript(env Environment) []byte {
+	code := assets.MustAssetString(scriptsPath + isSetupCogitoFilename)
 
 	return []byte(replaceAddresses(code, env))
 }
