@@ -163,17 +163,17 @@ pub contract Cogito: NonFungibleToken {
     // fetch
     // Get a reference to a Cogito from an account's Collection, if available.
     // If an account does not have a Cogito.Collection, panic.
-    // If it has a collection but does not contain the itemID, return nil.
-    // If it has a collection and that collection contains the itemID, return a reference to that.
+    // If it has a collection but does not contain the id, return nil.
+    // If it has a collection and that collection contains the id, return a reference to that.
     //
-    pub fun fetch(_ from: Address, itemID: UInt64): &Cogito.NFT? {
+    pub fun fetch(_ from: Address, id: UInt64): &Cogito.NFT? {
         let collection = getAccount(from)
             .getCapability(Cogito.CollectionPublicPath)
             .borrow<&Cogito.Collection{Cogito.CogitoCollectionPublic}>()
             ?? panic("Couldn't get collection")
-        // We trust Cogito.Collection.borowCogito to get the correct itemID
+        // We trust Cogito.Collection.borrowCogito to get the correct id
         // (it checks it before returning it).
-        return collection.borrowCogito(id: itemID)
+        return collection.borrowCogito(id: id)
     }
 
     // initializer
