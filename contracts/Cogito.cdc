@@ -1,75 +1,74 @@
-/*
-    Description: Central Smart Contract for Cogito Ergo Sum
-*/
-
 import NonFungibleToken from 0xNFTADDRESS
 
+//
+// NFT for Cogito ergo sum!
+//
 pub contract Cogito: NonFungibleToken {
 
-    // -----------------------------------------------------------------------
-    // Cogito contract Events
-    // -----------------------------------------------------------------------
-
-    // Emitted when the Cogito contract is created
+    // Events
+    //
     pub event ContractInitialized()
-    // Emitted when a cogito is withdrawn from a Collection
     pub event Withdraw(id: UInt64, from: Address?)
-    // Emitted when a cogito is deposited into a Collection
     pub event Deposit(id: UInt64, to: Address?)
-    // Emitted when a cogito is minted into a Collection
     pub event Minted(id: UInt64, metadata: String)
-    // Emitted when a Cogito is destroyed
-    pub event Destroyed(id: UInt64)
 
-    // The total number of Cogito NFTs that have been created
-    // Because NFTs can be destroyed, it doesn't necessarily mean that this
-    // reflects the total number of NFTs in existence, just the number that
-    // have been minted to date. Also used as global cogito IDs for minting.
+    // Named Paths
+    //
+    pub let CollectionStoragePath: StoragePath
+    pub let CollectionPublicPath: PublicPath
+
+    // totalSupply
+    // The total number of Cogito that have been minted
+    //
     pub var totalSupply: UInt64
 
-    pub resource interface ICOGITO {
-        pub fun getMetadata(): String
-    }
+    // NFT
+    // A Kitty Item as an NFT
+    //
+    pub resource NFT: NonFungibleToken.INFT {
 
-    pub resource NFT: NonFungibleToken.INFT, ICOGITO {
         pub let id: UInt64
 
-        pub var metadata: String
+        pub let metadata: String
 
-        init(initID: UInt64, metadata: String) {
-            self.id = initID
+        // initializer
+        //
+        init(id: UInt64, metadata: String) {
+            self.id = id
             self.metadata = metadata
-
-            emit Minted(id: self.id, metadata: self.metadata)
-        }
-
-        // If the Cogito is destroyed, emit an event to indicate
-        // to outside observers that it has been destroyed
-        destroy() {
-            emit Destroyed(id: self.id)
-        }
-
-        pub fun getMetadata(): String {
-            return self.metadata
         }
     }
 
-    pub resource interface CollectionPublic {
+    // This is the interface that users can cast their Cogito Collection as
+    // to allow others to deposit Cogito into their Collection. It also allows for reading
+    // the details of Cogito in the Collection.
+    pub resource interface CogitoCollectionPublic {
+        pub fun deposit(token: @NonFungibleToken.NFT)
+        pub fun getIDs(): [UInt64]
+        pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
+        pub fun borrowCogito(id: UInt64): &Cogito.NFT? {
+            // If the result isn't nil, the id of the returned reference
+            // should be the same as the argument to the function
+            post {
+                (result == nil) || (result?.id == id):
+                    "Cannot borrow Cogito reference: The ID of the returned reference is incorrect"
+            }
+        }
         pub fun mintNFT(metadata: String)
-        pub fun destroyNFT(id: UInt64)
-        pub fun borrowCogitoPublic(id: UInt64): &Cogito.NFT{NonFungibleToken.INFT, ICOGITO}
     }
 
-    pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, CollectionPublic {
+    // Collection
+    // A collection of Cogito NFTs owned by an account
+    //
+    pub resource Collection: CogitoCollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
+        //
         pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
-        init () {
-            self.ownedNFTs <- {}
-        }
-
-        // withdraw removes an NFT from the collection and moves it to the caller
+        // withdraw
+        // Removes an NFT from the collection and moves it to the caller
+        //
         pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
@@ -78,8 +77,10 @@ pub contract Cogito: NonFungibleToken {
             return <-token
         }
 
-        // deposit takes a NFT and adds it to the collections dictionary
+        // deposit
+        // Takes a NFT and adds it to the collections dictionary
         // and adds the ID to the id array
+        //
         pub fun deposit(token: @NonFungibleToken.NFT) {
             let token <- token as! @Cogito.NFT
 
@@ -93,75 +94,88 @@ pub contract Cogito: NonFungibleToken {
             destroy oldToken
         }
 
-        // getIDs returns an array of the IDs that are in the collection
+        // getIDs
+        // Returns an array of the IDs that are in the collection
+        //
         pub fun getIDs(): [UInt64] {
             return self.ownedNFTs.keys
         }
 
-        // borrowNFT gets a reference to an NFT in the collection
+        // borrowNFT
+        // Gets a reference to an NFT in the collection
         // so that the caller can read its metadata and call its methods
+        //
         pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
             return &self.ownedNFTs[id] as &NonFungibleToken.NFT
         }
 
-        pub fun borrowCogitoPublic(id: UInt64): &Cogito.NFT{NonFungibleToken.INFT, ICOGITO} {
-            let cogitoRef = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT
-            let intermediateRef = cogitoRef as! auth &Cogito.NFT
-            return intermediateRef as &Cogito.NFT{NonFungibleToken.INFT, ICOGITO}
+        // borrowCogito
+        // Gets a reference to an NFT in the collection as a Cogito,
+        // exposing all of its fields (including the typeID).
+        // This is safe as there are no functions that can be called on the Cogito.
+        //
+        pub fun borrowCogito(id: UInt64): &Cogito.NFT? {
+            if self.ownedNFTs[id] != nil {
+                let ref = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT
+                return ref as! &Cogito.NFT
+            } else {
+                return nil
+            }
         }
 
-        destroy() {
-            destroy self.ownedNFTs
-        }
-
-            // mintNFT can mint cogito for self
         pub fun mintNFT(metadata: String) {
+            emit Minted(id: Cogito.totalSupply, metadata: metadata)
 
-            // create a new NFT
-            var newNFT <- create NFT(initID: Cogito.totalSupply, metadata: metadata)
-
-            // deposit it in the recipient's account using their reference
-            self.deposit(token: <-newNFT)
+            self.deposit(token: <-create Cogito.NFT(id: Cogito.totalSupply, metadata: metadata))
 
             Cogito.totalSupply = Cogito.totalSupply + (1 as UInt64)
         }
 
-          pub fun destroyNFT(id: UInt64) {
-            let token <- self.withdraw(withdrawID: id)
+        // destructor
+        destroy() {
+            destroy self.ownedNFTs
+        }
 
-            destroy token
+        // initializer
+        //
+        init () {
+            self.ownedNFTs <- {}
         }
     }
 
+    // createEmptyCollection
     // public function that anyone can call to create a new empty collection
+    //
     pub fun createEmptyCollection(): @NonFungibleToken.Collection {
         return <- create Collection()
     }
 
-    pub fun tokenURI(address: Address, id: UInt64): String {
-        if let collectionRef = getAccount(address).getCapability(/public/CogitoCollection).borrow<&{NonFungibleToken.CollectionPublic, CollectionPublic}>() {
-            let pass = collectionRef.borrowCogitoPublic(id: id)
-            if pass != nil {
-                return pass.getMetadata()
-            }
-        }
-        return ""
+    // fetch
+    // Get a reference to a Cogito from an account's Collection, if available.
+    // If an account does not have a Cogito.Collection, panic.
+    // If it has a collection but does not contain the itemID, return nil.
+    // If it has a collection and that collection contains the itemID, return a reference to that.
+    //
+    pub fun fetch(_ from: Address, itemID: UInt64): &Cogito.NFT? {
+        let collection = getAccount(from)
+            .getCapability(Cogito.CollectionPublicPath)
+            .borrow<&Cogito.Collection{Cogito.CogitoCollectionPublic}>()
+            ?? panic("Couldn't get collection")
+        // We trust Cogito.Collection.borowCogito to get the correct itemID
+        // (it checks it before returning it).
+        return collection.borrowCogito(id: itemID)
     }
 
-    init() {
+    // initializer
+    //
+	init() {
+        // Set our named paths
+        self.CollectionStoragePath = /storage/cogitoCollection
+        self.CollectionPublicPath = /public/cogitoCollection
+
         // Initialize the total supply
         self.totalSupply = 0
 
-        // Create a Collection resource and save it to storage
-        let collection <- create Collection()
-        self.account.save(<-collection, to: /storage/CogitoCollection)
-
-        // create a public capability for the collection
-        self.account.link<&{NonFungibleToken.CollectionPublic}>(
-            /public/CogitoCollection,
-            target: /storage/CogitoCollection
-        )
-
         emit ContractInitialized()
-    }
+	}
 }
