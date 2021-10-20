@@ -1,27 +1,21 @@
 import NonFungibleToken from 0xNFTADDRESS
 import Cogito from 0xCOGITOADDRESS
-// This transaction is what an account would run
-// to set itself up to receive NFTs
+
+// This transaction configures an account to hold and mint Cogito.
 
 transaction {
+    prepare(signer: AuthAccount) {
+        // if the account doesn't already have a collection
+        if signer.borrow<&Cogito.Collection>(from: Cogito.CollectionStoragePath) == nil {
 
-    prepare(acct: AuthAccount) {
+            // create a new empty collection
+            let collection <- Cogito.createEmptyCollection()
 
-        // Return early if the account already has a collection
-        if acct.borrow<&Cogito.Collection>(from: /storage/CogitoCollection) != nil {
-            return
+            // save it to the account
+            signer.save(<-collection, to: Cogito.CollectionStoragePath)
+
+            // create a public capability for the collection
+            signer.link<&Cogito.Collection{NonFungibleToken.CollectionPublic, Cogito.CogitoCollectionPublic}>(Cogito.CollectionPublicPath, target: Cogito.CollectionStoragePath)
         }
-
-        // Create a new empty collection
-        let collection <- Cogito.createEmptyCollection()
-
-        // save it to the account
-        acct.save(<-collection, to: /storage/CogitoCollection)
-
-        // create a public capability for the collection
-        acct.link<&{NonFungibleToken.CollectionPublic}>(
-            /public/CogitoCollection,
-            target: /storage/CogitoCollection
-        )
     }
 }
