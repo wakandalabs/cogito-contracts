@@ -250,7 +250,7 @@ type bintree struct {
 }
 
 var _bintree = &bintree{nil, map[string]*bintree{
-	"Cogito.cdc":           {cogitoCdc, map[string]*bintree{}},
+	"Cogito.cdc": {cogitoCdc, map[string]*bintree{}},
 	"NonFungibleToken.cdc": {nonfungibletokenCdc, map[string]*bintree{}},
 }}
 
