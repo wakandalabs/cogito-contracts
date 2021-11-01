@@ -92,10 +92,15 @@ func TestMintCogito(t *testing.T) {
 
 	env.CogitoAddress = cogitoAddr.String()
 
+	// Create a new user account
+	joshAccountKey, joshSigner := accountKeys.NewWithSigner()
+	joshAddress, _ := b.CreateAccount([]*flow.AccountKey{joshAccountKey}, nil)
+
 	// Check that that main contract fields were initialized correctly
 	result := executeScriptAndCheck(t, b, templates.GenerateGetTotalSupplyScript(env), nil)
 	assert.Equal(t, cadence.NewUInt64(0), result)
 
+	// create a new Collection for Admin
 	t.Run("Should be able to setup account", func(t *testing.T) {
 		tx := createTxWithTemplateAndAuthorizer(b, templates.GenerateSetupAccountScript(env), cogitoAddr)
 
@@ -112,6 +117,7 @@ func TestMintCogito(t *testing.T) {
 		assert.Equal(t, cadence.NewBool(true), result)
 	})
 
+	// Admin sends a transaction that mints a cogito
 	t.Run("Should be able to mint a cogito", func(t *testing.T) {
 		tx := createTxWithTemplateAndAuthorizer(b, templates.GenerateMintNFTScript(env), cogitoAddr)
 
@@ -127,14 +133,47 @@ func TestMintCogito(t *testing.T) {
 		result = executeScriptAndCheck(t, b, templates.GenerateReadCollectionIdsScript(env), [][]byte{jsoncdc.MustEncode(cadence.Address(cogitoAddr))})
 		assert.Equal(t, cadence.NewArray([]cadence.Value{cadence.NewUInt64(0)}), result)
 	})
-}
 
-// TestTransferCogito
-func TestTransferCogito(t *testing.T) {
+	// create a new Collection for a user address
+	t.Run("Should be able to create a cogito collection", func(t *testing.T) {
+		tx := createTxWithTemplateAndAuthorizer(b, templates.GenerateSetupAccountScript(env), joshAddress)
+		signAndSubmit(
+			t, b, tx,
+			[]flow.Address{b.ServiceKey().Address, joshAddress}, []crypto.Signer{b.ServiceKey().Signer(), joshSigner},
+			false,
+		)
+	})
 
-}
+	// Admin sends a transaction to transfer a cogito to a user
+	t.Run("Should be able to transfer a cogito", func(t *testing.T) {
+		tx := createTxWithTemplateAndAuthorizer(b, templates.GenerateTransferNFTScript(env), cogitoAddr)
 
-// TestBurnCogito
-func TestBurnCogito(t *testing.T) {
+		_ = tx.AddArgument(cadence.NewAddress(joshAddress))
+		_ = tx.AddArgument(cadence.NewUInt64(0))
 
+		signAndSubmit(
+			t, b, tx,
+			[]flow.Address{b.ServiceKey().Address, cogitoAddr}, []crypto.Signer{b.ServiceKey().Signer(), cogitoSigner},
+			false,
+		)
+
+		// make sure the user received it
+		result = executeScriptAndCheck(t, b, templates.GenerateReadCollectionIdsScript(env), [][]byte{jsoncdc.MustEncode(cadence.Address(joshAddress))})
+		assert.Equal(t, cadence.NewArray([]cadence.Value{cadence.NewUInt64(0)}), result)
+	})
+
+	t.Run("Should be able to burn a cogito", func(t *testing.T) {
+		tx := createTxWithTemplateAndAuthorizer(b, templates.GenerateBurnNFTScript(env), joshAddress)
+
+		_ = tx.AddArgument(cadence.NewUInt64(0))
+
+		signAndSubmit(
+			t, b, tx,
+			[]flow.Address{b.ServiceKey().Address, joshAddress}, []crypto.Signer{b.ServiceKey().Signer(), joshSigner},
+			false,
+		)
+
+		result = executeScriptAndCheck(t, b, templates.GenerateReadCollectionLengthScript(env), [][]byte{jsoncdc.MustEncode(cadence.Address(joshAddress))})
+		assert.Equal(t, cadence.NewInt(0), result)
+	})
 }
