@@ -1,9 +1,10 @@
 package test
 
 import (
-	"fmt"
 	"github.com/onflow/cadence"
+	jsoncdc "github.com/onflow/cadence/encoding/json"
 	"github.com/onflow/flow-go-sdk"
+	"github.com/onflow/flow-go-sdk/crypto"
 	"github.com/onflow/flow-go-sdk/test"
 	"github.com/wakandalabs/cogito-contracts/lib/go/templates"
 	"testing"
@@ -53,11 +54,6 @@ func TestCogitoDeployment(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-// TestSetupCogito
-func TestSetupCogito(t *testing.T) {
-
-}
-
 // TestMintCogito tests the pure functionality of the smart contract
 func TestMintCogito(t *testing.T) {
 	b := newBlockchain()
@@ -84,7 +80,7 @@ func TestMintCogito(t *testing.T) {
 	// Should be able to deploy the cogito contract
 	// as a new account with no keys.
 	cogitoCode := contracts.GenerateCogitoContract(nftAddr.String())
-	cogitoAccountKey, _ := accountKeys.NewWithSigner()
+	cogitoAccountKey, cogitoSigner := accountKeys.NewWithSigner()
 	cogitoAddr, _ := b.CreateAccount([]*flow.AccountKey{cogitoAccountKey}, []sdktemplates.Contract{
 		{
 			Name:   "Cogito",
@@ -100,10 +96,37 @@ func TestMintCogito(t *testing.T) {
 	result := executeScriptAndCheck(t, b, templates.GenerateGetTotalSupplyScript(env), nil)
 	assert.Equal(t, cadence.NewUInt64(0), result)
 
-	metadata := cadence.NewString("metadata")
+	t.Run("Should be able to setup account", func(t *testing.T) {
+		tx := createTxWithTemplateAndAuthorizer(b, templates.GenerateSetupAccountScript(env), cogitoAddr)
 
-	fmt.Println(metadata)
+		result = executeScriptAndCheck(t, b, templates.GenerateIsSetupCogitoScript(env), [][]byte{jsoncdc.MustEncode(cadence.Address(cogitoAddr))})
+		assert.Equal(t, cadence.NewBool(false), result)
 
+		signAndSubmit(
+			t, b, tx,
+			[]flow.Address{b.ServiceKey().Address, cogitoAddr}, []crypto.Signer{b.ServiceKey().Signer(), cogitoSigner},
+			false,
+		)
+
+		result = executeScriptAndCheck(t, b, templates.GenerateIsSetupCogitoScript(env), [][]byte{jsoncdc.MustEncode(cadence.Address(cogitoAddr))})
+		assert.Equal(t, cadence.NewBool(true), result)
+	})
+
+	t.Run("Should be able to mint a cogito", func(t *testing.T) {
+		tx := createTxWithTemplateAndAuthorizer(b, templates.GenerateMintNFTScript(env), cogitoAddr)
+
+		_ = tx.AddArgument(cadence.NewString("metadata"))
+
+		signAndSubmit(
+			t, b, tx,
+			[]flow.Address{b.ServiceKey().Address, cogitoAddr}, []crypto.Signer{b.ServiceKey().Signer(), cogitoSigner},
+			false,
+		)
+
+		//make sure the cogito was minted correctly and is stored in the collection with the correct data
+		result = executeScriptAndCheck(t, b, templates.GenerateReadCollectionIdsScript(env), [][]byte{jsoncdc.MustEncode(cadence.Address(cogitoAddr))})
+		assert.Equal(t, cadence.NewArray([]cadence.Value{cadence.NewUInt64(0)}), result)
+	})
 }
 
 // TestTransferCogito
