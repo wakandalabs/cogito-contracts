@@ -1,6 +1,6 @@
 module github.com/wakandalabs/cogito-contracts/libs/go/test
 
-go 1.6
+go 1.15
 
 require (
 	github.com/onflow/cadence v0.18.0

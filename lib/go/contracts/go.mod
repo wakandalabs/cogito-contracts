@@ -1,6 +1,6 @@
 module github.com/wakandalabs/cogito-contracts/lib/go/contracts
 
-go 1.16
+go 1.15
 
 require (
 	github.com/kevinburke/go-bindata v3.22.0+incompatible
