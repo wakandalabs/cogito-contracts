@@ -24,7 +24,7 @@ pub contract Cogito: NonFungibleToken {
     pub var totalSupply: UInt64
 
     // NFT
-    // A Kitty Item as an NFT
+    // A Cogito as an NFT
     //
     pub resource NFT: NonFungibleToken.INFT {
 
@@ -102,7 +102,6 @@ pub contract Cogito: NonFungibleToken {
 
         // borrowNFT
         // Gets a reference to an NFT in the collection
-        // so that the caller can read its metadata and call its methods
         //
         pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
             return &self.ownedNFTs[id] as &NonFungibleToken.NFT
@@ -110,7 +109,6 @@ pub contract Cogito: NonFungibleToken {
 
         // borrowCogito
         // Gets a reference to an NFT in the collection as a Cogito,
-        // exposing all of its fields (including the typeID).
         // This is safe as there are no functions that can be called on the Cogito.
         //
         pub fun borrowCogito(id: UInt64): &Cogito.NFT? {
